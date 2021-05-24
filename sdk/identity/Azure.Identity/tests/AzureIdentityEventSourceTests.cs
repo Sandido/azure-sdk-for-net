@@ -65,8 +65,6 @@ namespace Azure.Identity.Tests
         {
             var mockMsalClient = new MockMsalConfidentialClient(AuthenticationResultFactory.Create(Guid.NewGuid().ToString(), expiresOn: DateTimeOffset.Now + TimeSpan.FromMinutes(10)));
 
-            var mockAadClient = new MockAadIdentityClient(() => new AccessToken(Guid.NewGuid().ToString(), DateTimeOffset.UtcNow.AddMinutes(10)));
-
             var credential = InstrumentClient(new ClientCertificateCredential(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), new X509Certificate2(), default, default, mockMsalClient));
 
             var method = "ClientCertificateCredential.GetToken";
@@ -89,7 +87,7 @@ namespace Azure.Identity.Tests
         [Test]
         public async Task ValidateInteractiveBrowserCredentialSucceededEvents()
         {
-            var mockMsalClient = new MockMsalPublicClient() { InteractiveAuthFactory = (_) => { return AuthenticationResultFactory.Create(accessToken: Guid.NewGuid().ToString(), expiresOn: DateTimeOffset.UtcNow.AddMinutes(10)); } };
+            var mockMsalClient = new MockMsalPublicClient() { AuthFactory = _ => { return AuthenticationResultFactory.Create(accessToken: Guid.NewGuid().ToString(), expiresOn: DateTimeOffset.UtcNow.AddMinutes(10)); } };
 
             var credential = InstrumentClient(new InteractiveBrowserCredential(default, Guid.NewGuid().ToString(), default, default, mockMsalClient));
 
@@ -161,7 +159,7 @@ namespace Azure.Identity.Tests
         {
             var expExMessage = Guid.NewGuid().ToString();
 
-            var mockMsalClient = new MockMsalPublicClient() { InteractiveAuthFactory = (_) => throw new MockClientException(expExMessage) };
+            var mockMsalClient = new MockMsalPublicClient() { AuthFactory = _ => throw new MockClientException(expExMessage) };
 
             var credential = InstrumentClient(new InteractiveBrowserCredential(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), default, default, mockMsalClient));
 
